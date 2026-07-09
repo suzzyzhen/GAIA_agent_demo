@@ -28,6 +28,10 @@ from langgraph.graph.message import add_messages
 # HF_TOKEN = os.environ["HF_TOKEN"]
 
 # ======================================================================================
+gemini_model = "gemini-3.1-flash-lite"
+groq_model = "meta-llama/llama-4-scout-17b-16e-instruct"
+huggingFace_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
+
 
 from langchain_core.tools import tool
 import os
@@ -93,10 +97,10 @@ def web_search(query: str) -> str:
 
     search = TavilySearch(max_results=2, api_key=os.environ.get("TAVILY_API_KEY"))
     responses = search.invoke(query)
-    if isinstance(responses, dict):
-        docs = responses.get("results", [])
-    else:
-        docs = responses
+    # if isinstance(responses, dict):
+    #     docs = responses.get("results", [])
+    # else:
+    #     docs = responses
 
     formatted_responses = "\n\n".join(
       f"""[{i}]
@@ -104,7 +108,7 @@ def web_search(query: str) -> str:
         URL: {doc.get("url", "")}
         Content: {doc.get("content", "")}
       """
-      for i, doc in enumerate(docs, start=1)
+      for i, doc in enumerate(responses["results"], start=1)
       )
     return {"web_results": formatted_responses}
 
@@ -267,13 +271,13 @@ def build_graph(provider: str = "google"):
     """Build the graph"""
     if provider == "google":
         # Google Gemini
-        llm = ChatGoogleGenerativeAI(model="gemini-3.1-flash-lite", temperature=0)
+        llm = ChatGoogleGenerativeAI(model=gemini_model, temperature=0)
     elif provider == "groq":
-        llm = ChatGroq(model="meta-llama/llama-4-scout-17b-16e-instruct", temperature=0)
+        llm = ChatGroq(model=groq_model, temperature=0)
     elif provider == "huggingface":
         llm = ChatHuggingFace(
             llm=HuggingFaceEndpoint(
-            model="openai/gpt-oss-20b",
+            model=huggingFace_model,
             # huggingfacehub_api_token=os.environ["HF_TOKEN"],
             temperature=0,
           ),

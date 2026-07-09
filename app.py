@@ -5,6 +5,7 @@ import inspect
 import pandas as pd
 from langchain_core.messages import HumanMessage
 from agent import build_graph
+from huggingface_hub import hf_hub_download
 import re
 
 # (Keep Constants as is)
@@ -18,6 +19,28 @@ def extract_final_answer(text: str) -> str:
     match = re.search(r"FINAL ANSWER:\s*(.+)", text, re.IGNORECASE)
     return match.group(1).strip() if match else text.strip()
 
+def resolve_file(file_name: str) -> str | None:
+    """Download a GAIA task attachment and return its local path.
+    Returns None if no file_name is provided."""
+    if not file_name:
+        return None
+
+    # hf_hub_download caches files locally — calling it twice for the same
+    # file is free (returns the cached path immediately).
+    return hf_hub_download(
+        repo_id="gaia-benchmark/GAIA",
+        repo_type="dataset",
+        filename=f"2023/validation/{file_name}",  # adjust split if needed
+        token=os.environ.get("HF_TOKEN"),
+    )
+
+
+def build_user_content(question: str, file_name: str) -> str:
+    """Combine the question text with a resolved local file path, if any."""
+    resolved_path = resolve_file(file_name)
+    if resolved_path:
+        return f"{question}\n\nAttached file path: {resolved_path}"
+    return question
 
 class BasicAgent:
     def __init__(self):
@@ -25,25 +48,21 @@ class BasicAgent:
         self.graph = build_graph(provider="huggingface")
 
 
-    def __call__(self, question: str) -> str:
+    def __call__(self, question: str, file_name: str = "") -> str:
         print(f"Agent received question (first 50 chars): {question[:50]}...")
-        messages = [HumanMessage(content=question)]
+        user_content = build_user_content(question, file_name)
+        messages = [HumanMessage(content=user_content)]
         result = self.graph.invoke({"messages": messages})
         answer = result['messages'][-1].content
-        final_message = extract_final_answer(answer)
-        return final_message  # kein [14:] mehr nötig!
+        # return extract_final_answer(answer)
+        return answer  
 
 
-def run_and_submit_all( profile: gr.OAuthProfile | None):
-    """
-    Fetches all questions, runs the BasicAgent on them, submits all answers,
-    and displays the results.
-    """
-    # --- Determine HF Space Runtime URL and Repo URL ---
-    space_id = os.getenv("SPACE_ID") # Get the SPACE_ID for sending link to the code
+def run_and_submit_all(profile: gr.OAuthProfile | None):
+    space_id = os.getenv("SPACE_ID")
 
     if profile:
-        username= f"{profile.username}"
+        username = f"{profile.username}"
         print(f"User logged in: {username}")
     else:
         print("User not logged in.")
@@ -53,54 +72,62 @@ def run_and_submit_all( profile: gr.OAuthProfile | None):
     questions_url = f"{api_url}/questions"
     submit_url = f"{api_url}/submit"
 
-    # 1. Instantiate Agent ( modify this part to create your agent)
     try:
         agent = BasicAgent()
     except Exception as e:
         print(f"Error instantiating agent: {e}")
         return f"Error initializing agent: {e}", None
-    # In the case of an app running as a hugging Face space, this link points toward your codebase ( usefull for others so please keep it public)
+
     agent_code = f"https://huggingface.co/spaces/{space_id}/tree/main"
     print(agent_code)
 
-    # 2. Fetch Questions
     print(f"Fetching questions from: {questions_url}")
     try:
         response = requests.get(questions_url, timeout=15)
         response.raise_for_status()
         questions_data = response.json()
         if not questions_data:
-             print("Fetched questions list is empty.")
-             return "Fetched questions list is empty or invalid format.", None
+            print("Fetched questions list is empty.")
+            return "Fetched questions list is empty or invalid format.", None
         print(f"Fetched {len(questions_data)} questions.")
     except requests.exceptions.RequestException as e:
         print(f"Error fetching questions: {e}")
         return f"Error fetching questions: {e}", None
     except requests.exceptions.JSONDecodeError as e:
-         print(f"Error decoding JSON response from questions endpoint: {e}")
-         print(f"Response text: {response.text[:500]}")
-         return f"Error decoding server response for questions: {e}", None
+        print(f"Error decoding JSON: {e}")
+        return f"Error decoding server response for questions: {e}", None
     except Exception as e:
-        print(f"An unexpected error occurred fetching questions: {e}")
+        print(f"Unexpected error fetching questions: {e}")
         return f"An unexpected error occurred fetching questions: {e}", None
 
-    # 3. Run your Agent
     results_log = []
     answers_payload = []
     print(f"Running agent on {len(questions_data)} questions...")
+
     for item in questions_data:
         task_id = item.get("task_id")
         question_text = item.get("question")
+        file_name = item.get("file_name", "")  # <-- pull file_name from each question item
+
         if not task_id or question_text is None:
             print(f"Skipping item with missing task_id or question: {item}")
             continue
+
         try:
-            submitted_answer = agent(question_text)
+            submitted_answer = agent(question_text, file_name)  # <-- pass it to the agent
             answers_payload.append({"task_id": task_id, "submitted_answer": submitted_answer})
-            results_log.append({"Task ID": task_id, "Question": question_text, "Submitted Answer": submitted_answer})
+            results_log.append({
+                "Task ID": task_id,
+                "Question": question_text,
+                "Submitted Answer": submitted_answer,
+            })
         except Exception as e:
-             print(f"Error running agent on task {task_id}: {e}")
-             results_log.append({"Task ID": task_id, "Question": question_text, "Submitted Answer": f"AGENT ERROR: {e}"})
+            print(f"Error running agent on task {task_id}: {e}")
+            results_log.append({
+                "Task ID": task_id,
+                "Question": question_text,
+                "Submitted Answer": f"AGENT ERROR: {e}",
+            })
 
     if not answers_payload:
         print("Agent did not produce any answers to submit.")
