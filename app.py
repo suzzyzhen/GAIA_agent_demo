@@ -22,7 +22,7 @@ def extract_final_answer(text: str) -> str:
 class BasicAgent:
     def __init__(self):
         print("BasicAgent initialized.")
-        self.graph = build_graph(provider="groq")
+        self.graph = build_graph(provider="huggingface")
 
 
     def __call__(self, question: str) -> str:
