@@ -30,7 +30,7 @@ from langgraph.graph.message import add_messages
 # ======================================================================================
 gemini_model = "gemini-3.1-flash-lite"
 groq_model = "meta-llama/llama-4-scout-17b-16e-instruct"
-huggingFace_model = "Qwen/Qwen2.5-Coder-32B-Instruct"
+huggingFace_model = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
 
 
 from langchain_core.tools import tool
