@@ -19,6 +19,8 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFaceEmbeddings
 from langgraph.graph.message import add_messages
+import whisper
+
 
 
 # GROQ_API_KEY = os.environ["GROQ_API_KEY"] 
@@ -96,7 +98,7 @@ def web_search(query: str) -> str:
     Args:
         query: The search query."""
 
-    search = TavilySearch(max_results=2, api_key=os.environ.get("TAVILY_API_KEY"))
+    search = TavilySearch(max_results=3, api_key=os.environ.get("TAVILY_API_KEY"))
     responses = search.invoke(query)
 
     if isinstance(responses, dict):
@@ -256,6 +258,16 @@ def analyze_image(file_path: str) -> str:
 
     return f"Received image of size {len(image_bytes)} bytes. (Image analysis not implemented yet.)"
 
+
+
+@tool
+def audio_transcriber(file_path: str) -> str:
+    """Transcribe an audio file (mp3, wav, m4a, etc.) to text.
+    Use this for any question that references an audio recording,
+    lecture, voicemail, or similar attached audio file."""
+    _whisper_model = whisper.load_model("base")
+    result = _whisper_model.transcribe(file_path)
+    return result["text"].strip()
 
 # ==================================================================================
 tools = [

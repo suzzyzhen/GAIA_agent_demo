@@ -16,3 +16,4 @@ pdf2image
 pillow
 langchain-google-genai
 langchain-huggingface
+openai-whisper
