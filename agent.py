@@ -91,8 +91,12 @@ def web_search(query: str) -> str:
     Args:
         query: The search query."""
 
-    search = TavilySearch(max_results=3)
+    search = TavilySearch(max_results=2)
     responses = search.invoke(query)
+    if isinstance(responses, dict):
+        docs = responses.get("results", [])
+    else:
+        docs = responses
 
     formatted_responses = "\n\n".join(
       f"""[{i}]
@@ -100,7 +104,7 @@ def web_search(query: str) -> str:
         URL: {doc.get("url", "")}
         Content: {doc.get("content", "")}
       """
-      for i, doc in enumerate(responses["results"], start=1)
+      for i, doc in enumerate(docs, start=1)
       )
     return {"web_results": formatted_responses}
 
