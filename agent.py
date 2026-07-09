@@ -280,6 +280,8 @@ tools = [
     image_ocr,
     code_file_interpreter, 
     analyze_image,
+    audio_transcriber,
+    
 ]
 
 class AgentState(TypedDict):
