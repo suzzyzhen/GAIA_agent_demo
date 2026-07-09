@@ -3,6 +3,9 @@ import gradio as gr
 import requests
 import inspect
 import pandas as pd
+from langchain_core.messages import HumanMessage
+from agent import build_graph
+import re
 
 # (Keep Constants as is)
 # --- Constants ---
@@ -10,14 +13,26 @@ DEFAULT_API_URL = "https://agents-course-unit4-scoring.hf.space"
 
 # --- Basic Agent Definition ---
 # ----- THIS IS WERE YOU CAN BUILD WHAT YOU WANT ------
+
+def extract_final_answer(text: str) -> str:
+    match = re.search(r"FINAL ANSWER:\s*(.+)", text, re.IGNORECASE)
+    return match.group(1).strip() if match else text.strip()
+
+
 class BasicAgent:
     def __init__(self):
         print("BasicAgent initialized.")
+        self.graph = build_graph(provider="groq")
+
+
     def __call__(self, question: str) -> str:
         print(f"Agent received question (first 50 chars): {question[:50]}...")
-        fixed_answer = "This is a default answer."
-        print(f"Agent returning fixed answer: {fixed_answer}")
-        return fixed_answer
+        messages = [HumanMessage(content=question)]
+        result = self.graph.invoke({"messages": messages})
+        answer = result['messages'][-1].content
+        final_message = extract_final_answer(final_message)
+        return final_message  # kein [14:] mehr nötig!
+
 
 def run_and_submit_all( profile: gr.OAuthProfile | None):
     """

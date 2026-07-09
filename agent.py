@@ -6,7 +6,8 @@ from tools import (
     pdf_reader,
     spreadsheet_reader,
     image_ocr,
-    code_file_interpreter
+    code_file_interpreter, 
+    analyze_image
 )
 import wikipediaapi
 from langgraph.graph import MessagesState, START, StateGraph
@@ -19,8 +20,15 @@ import operator
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFaceEmbeddings
+import os
+from langgraph.graph.message import add_messages
 
 
+# GROQ_API_KEY = os.environ["GROQ_API_KEY"] 
+
+# GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
+
+# HF_TOKEN = os.environ["HF_TOKEN"]
 
 
 tools = [
@@ -31,8 +39,12 @@ tools = [
     pdf_reader,
     spreadsheet_reader,
     image_ocr,
-    code_file_interpreter
+    code_file_interpreter, 
+    analyze_image,
 ]
+
+class AgentState(TypedDict):
+    messages: Annotated[list, add_messages]
 
 def build_graph(provider: str = "google"):
     """Build the graph"""
@@ -45,7 +57,7 @@ def build_graph(provider: str = "google"):
         llm = ChatHuggingFace(
             llm=HuggingFaceEndpoint(
             model="Qwen/Qwen2.5-Coder-32B-Instruct",
-            huggingfacehub_api_token=os.environ["HF_TOKEN"],
+            # huggingfacehub_api_token=os.environ["HF_TOKEN"],
             temperature=0,
           ),
             verbose=False,
@@ -55,7 +67,7 @@ def build_graph(provider: str = "google"):
 
     llm_with_tools = llm.bind_tools(tools)
 
-    def assistant(state: MessagesState):
+    def assistant(state: AgentState):
         """Assistant node"""
         with open('system_prompt.txt', 'r') as f:
             system_prompt = f.read()
@@ -64,7 +76,7 @@ def build_graph(provider: str = "google"):
         return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"])]}
 
     # Graph
-    builder = StateGraph(MessagesState)
+    builder = StateGraph(AgentState)
 
     # Nodes
     builder.add_node("assistant", assistant)

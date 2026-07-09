@@ -6,8 +6,11 @@ import pdfplumber
 from pdf2image import convert_from_path
 import pandas as pd
 import pytesseract
-from PIL import Image
+# from PIL import Image
+import PIL.Image
 import subprocess
+from langchain_tavily import TavilySearch
+from typing import Optional
 
 # ========================Calculator Tools========================
 @tool
@@ -128,27 +131,35 @@ def pdf_reader(file_path: str) -> str:
     return extracted_text if extracted_text else "No text could be extracted from this PDF."
 
 @tool
-def spreadsheet_reader(file_path: str, sheet_name: str = None) -> str:
-    """Read a CSV or Excel file at the given local file path and return its
-    contents as text. Optionally specify sheet_name for a specific Excel sheet;
-    if omitted, all sheets are returned."""
+def spreadsheet_reader(
+    file_path: str,
+    sheet_name: Optional[str] = None,
+) -> str:
+    """Read a CSV or Excel file.
+
+    Args:
+        file_path: Path to a CSV or Excel file.
+        sheet_name: Name of the Excel sheet. If omitted, all sheets are read.
+    """
     if file_path.endswith(".csv"):
         df = pd.read_csv(file_path)
-        return df.to_string(index=False)
+        return df.to_markdown(index=False)
 
-    if sheet_name:
+    if sheet_name is not None:
         df = pd.read_excel(file_path, sheet_name=sheet_name)
-        return df.to_string(index=False)
-    else:
-        sheets = pd.read_excel(file_path, sheet_name=None)
-        parts = [f"Sheet: {name}\n{df.to_string(index=False)}" for name, df in sheets.items()]
-        return "\n\n---\n\n".join(parts)
+        return df.to_markdown(index=False)
+
+    sheets = pd.read_excel(file_path, sheet_name=None)
+    return "\n\n---\n\n".join(
+        f"## Sheet: {name}\n\n{df.to_markdown(index=False)}"
+        for name, df in sheets.items()
+    )
     
 @tool
 def image_ocr(file_path: str) -> str:
     """Extract any visible text from an image file using OCR.
     Best for screenshots, scanned documents, charts with labels, or text-heavy images."""
-    img = Image.open(file_path)
+    img = PIL.Image.open(file_path)
     text = pytesseract.image_to_string(img)
     return text.strip() if text.strip() else "No text found in image."
 
@@ -159,6 +170,7 @@ def code_file_interpreter(file_path: str, mode: str = "execute") -> str:
     mode='execute': runs the file (Python only) and returns stdout/stderr.
     mode='read': returns the raw source code as text, for inspection/reasoning
     without running it."""
+    
     if mode == "read":
         try:
             with open(file_path, "r") as f:
@@ -188,3 +200,12 @@ def code_file_interpreter(file_path: str, mode: str = "execute") -> str:
 
     else:
         return f"Unknown mode: {mode}. Use 'execute' or 'read'."
+    
+@tool
+def analyze_image(file_path: str) -> str:
+    """Analyze an image and answer a question about it."""
+
+    with open(file_path, "rb") as f:
+        image_bytes = f.read()
+
+    return f"Received image of size {len(image_bytes)} bytes. (Image analysis not implemented yet.)"
