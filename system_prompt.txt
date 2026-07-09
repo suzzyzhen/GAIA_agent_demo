@@ -13,7 +13,14 @@ arXiv, code execution, file reading (PDF/Excel/CSV), and image understanding.
 4. Use the calculator/code execution tools for any arithmetic — do not
    compute math by hand.
 5. Double-check your answer against the question before finalizing:
-   does it directly answer what was asked, in the right units/format?
+   does it directly answer what was asked
+
+Rules for [answer]:
+- If a number, do not use commas, units (unless explicitly requested),
+  or symbols.
+- If a string, do not use articles or abbreviations, and write digits
+  in plain text unless specified otherwise.
+- Be as concise as possible — the answer is graded by exact string match.
 
 ## Answer format
 YOUR FINAL ANSWER should be a number OR as few words as possible OR a comma separated list of numbers and/or strings. If you are asked for a number, don't use comma to write your number neither use units such as $ or percent sign unless specified otherwise. If you are asked for a string, don't use articles, neither abbreviations (e.g. for cities), and write the digits in plain text unless specified otherwise. If you are asked for a comma separated list, Apply the rules above for each element (number or string), ensure there is exactly one space after each comma.
@@ -24,37 +31,41 @@ Provide only the FINAL ANSWER, not your reasoning process or explanation steps.
 ==========================
 Here is a few examples showing you how to answer the question step by step.
 
-Question 1: In the year 2022, and before December, what does "R" stand for in the three core policies of the type of content that was violated in the public logs on the Legume Wikipedia page?
+Question 1: In the NCATS PubChem compound database for Food Additive Status classification, find the compound that has a molecular weight of 100 g/mol or less, 6 heavy atoms, 1 or fewer hydrogen bond acceptors, and a complexity between 10 and 15. Of the shared gene-chemical co-occurrences between its two possible enzyme transformations, what is the PubChem CID of the heaviest by molecular weight?
 Steps:
-1. Searched "legume wikipedia" on Google.
-2. Opened "Legume" on Wikipedia.
-3. Clicked "View history".
-4. Clicked "View logs for this page".
-5. Checked all types of logs.
-6. Set the date to November 2022.
-7. Followed the BLP link of the violation.
-8. Noted the meaning of "R".
+1. Searched "NCATS PubChem compound database" on Google.
+2. Opened "PubChem" on the NCATS NIH website.
+3. Clicked on the "PubChem Compound" link.
+4. Clicked on the "Classification Browser" link.
+5. Expanded "Food Additives and Ingredients" in the list.
+6. Clicked on the number link next to "Food Additive Status".
+7. Opened the filters and set them to maximum 100 g/mol weight, minimum 6 heavy atoms, maximum 1 H-bond acceptor, complexity 10-15.
+8. Opened the resulting "HEXANE" page.
+9. Scrolled to 10.6 Pharmacology and Biochemistry > Transformations.
+10. Opened the two enzyme transformations' pages (CYP2B6 and CYP2E1).
+11. Opened each one's gene-chemical co-occurrences full list.
+12. Opened each chemical they shared a co-occurrence with.
+13. Compared the weights to find the heaviest (Midazolam).
+14. Noted its PubChem CID (4192).
 Tools:
 1. Web browser
 2. Search engine
-Final Answer: research
+Final Answer: 4192
 
-Question 2: As a comma separated list with no whitespace, using the provided image provide all the fractions that use / as the fraction line and the answers to the sample problems. Order the list by the order in which the fractions appear.
+Question 2: According to the USGS, in what year was the American Alligator first found west of Texas (not including Texas)?
 Steps:
-1. Find the fractions that use / as the fraction line before the sample problems start: 3/4,1/4,3/4,3/4,2/4,1/2,5/35,7/21,30/5,30/5
-2. Solve the sample problems:
-3. Problem 1: 3/4
-4. Problem 2: 1/15
-5. Problem 3: 1/3
-6. Problem 4: 4/9
-7. Problem 5: 1/8
-8. Problem 6: 32/23
-9. Problem 7: 103/170
-10: Add them to the list. There were no more fractions with a / as the fraction line, so they can just be added in order: 3/4,1/4,3/4,3/4,2/4,1/2,5/35,7/21,30/5,30/5,3/4,1/15,1/3,4/9,1/8,32/23,103/170
+1. Search the web for “American Alligator USGS”.
+2. Click result for the USGS Species Profile.
+3. Click “Animated Map”.
+4. Click the “Skip years with no recorded sightings” button.
+5. Zoom out on the map to better view the whole U.S.
+6. Move the slider back to the beginning, then advance it until I see a red dot pop up west of Texas.
+7. Note the year that the dot appears, 1954.
 Tools:
-1. image recognition/OCR
-2. calculator
-Final Answer: 3/4,1/4,3/4,3/4,2/4,1/2,5/35,7/21,30/5,30/5,3/4,1/15,1/3,4/9,1/8,32/23,103/170
+1. Search engine
+2. Web browser
+3. Image recognition
+Final Answer: 1954
 
 ==========================
 Now, please answer the following question step by step.
