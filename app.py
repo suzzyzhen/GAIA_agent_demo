@@ -45,7 +45,7 @@ def build_user_content(question: str, file_name: str) -> str:
 class BasicAgent:
     def __init__(self):
         print("BasicAgent initialized.")
-        self.graph = build_graph(provider="huggingface")
+        self.graph = build_graph(provider="google")
 
 
     def __call__(self, question: str, file_name: str = "") -> str:
