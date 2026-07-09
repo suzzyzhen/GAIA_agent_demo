@@ -30,7 +30,7 @@ class BasicAgent:
         messages = [HumanMessage(content=question)]
         result = self.graph.invoke({"messages": messages})
         answer = result['messages'][-1].content
-        final_message = extract_final_answer(final_message)
+        final_message = extract_final_answer(answer)
         return final_message  # kein [14:] mehr nötig!
 
 
