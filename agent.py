@@ -259,7 +259,6 @@ def analyze_image(file_path: str) -> str:
     return f"Received image of size {len(image_bytes)} bytes. (Image analysis not implemented yet.)"
 
 
-
 @tool
 def audio_transcriber(file_path: str) -> str:
     """Transcribe an audio file (mp3, wav, m4a, etc.) to text.
@@ -300,8 +299,7 @@ def build_graph(provider: str = "google"):
             model=huggingFace_model,
             # huggingfacehub_api_token=os.environ["HF_TOKEN"],
             temperature=0,
-          ),
-            verbose=False,
+          )
         )
     else:
         raise ValueError("Invalid provider. Choose 'google', 'groq' or 'huggingface'.")
