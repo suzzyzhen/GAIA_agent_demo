@@ -91,7 +91,7 @@ def web_search(query: str) -> str:
     Args:
         query: The search query."""
 
-    search = TavilySearch(max_results=2)
+    search = TavilySearch(max_results=2, api_key=os.environ.get("TAVILY_API_KEY"))
     responses = search.invoke(query)
     if isinstance(responses, dict):
         docs = responses.get("results", [])
