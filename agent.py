@@ -91,26 +91,32 @@ def square_root(a: float) -> float:
 
 @tool
 def web_search(query: str) -> str:
-    """Search Tavily for a query and return maximum 2 results.
+    """Search the web for a query and return the top results including
+    title, URL, and content snippet for each.
     Args:
         query: The search query."""
 
     search = TavilySearch(max_results=2, api_key=os.environ.get("TAVILY_API_KEY"))
     responses = search.invoke(query)
-    # if isinstance(responses, dict):
-    #     docs = responses.get("results", [])
-    # else:
-    #     docs = responses
+
+    if isinstance(responses, dict):
+        docs = responses.get("results", [])
+    elif isinstance(responses, list):
+        docs = responses
+    else:
+        return f"Unexpected response format from Tavily: {type(responses)}"
+
+    if not docs:
+        return "No results found."
 
     formatted_responses = "\n\n".join(
-      f"""[{i}]
-        Title: {doc.get("title", "")}
-        URL: {doc.get("url", "")}
-        Content: {doc.get("content", "")}
-      """
-      for i, doc in enumerate(responses["results"], start=1)
-      )
-    return {"web_results": formatted_responses}
+        f"[{i}]\n"
+        f"  Title: {doc.get('title', '')}\n"
+        f"  URL: {doc.get('url', '')}\n"
+        f"  Content: {doc.get('content', '')}"
+        for i, doc in enumerate(docs, start=1)
+    )
+    return formatted_responses  
 
 @tool
 def arxiv_search(query: str) -> str:
