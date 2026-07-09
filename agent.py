@@ -30,7 +30,7 @@ import whisper
 # HF_TOKEN = os.environ["HF_TOKEN"]
 
 # ======================================================================================
-gemini_model = "gemini-3.1-flash-lite"
+gemini_model = "gemini-2.5-flash"
 groq_model = "meta-llama/llama-4-scout-17b-16e-instruct"
 huggingFace_model = "meta-llama/Llama-4-Scout-17B-16E-Instruct"
 
