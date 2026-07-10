@@ -21,6 +21,8 @@ from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingF
 from langgraph.graph.message import add_messages
 import whisper
 from youtube_transcript_api import YouTubeTranscriptApi
+from ddgs import DDGS 
+import re
 
 
 # GROQ_API_KEY = os.environ["GROQ_API_KEY"] 
@@ -98,27 +100,46 @@ def web_search(query: str) -> str:
     Args:
         query: The search query."""
 
-    search = TavilySearch(max_results=3, api_key=os.environ.get("TAVILY_API_KEY"))
-    responses = search.invoke(query)
+    docs = []
 
-    if isinstance(responses, dict):
-        docs = responses.get("results", [])
-    elif isinstance(responses, list):
-        docs = responses
-    else:
-        return f"Unexpected response format from Tavily: {type(responses)}"
+    # Try DuckDuckGo first
+    try:
+        with DDGS() as ddgs:
+            results = list(ddgs.text(query, max_results=3))
+        docs = [
+            {"title": r.get("title", ""), "url": r.get("href", ""), "content": r.get("body", "")}
+            for r in results
+        ]
+    except Exception:
+        docs = []
+
+    # Fall back to Tavily if DDG failed or returned nothing
+    if not docs:
+        search = TavilySearch(max_results=3, api_key=os.environ.get("TAVILY_API_KEY"))
+        responses = search.invoke(query)
+
+        if isinstance(responses, dict):
+            raw_docs = responses.get("results", [])
+        elif isinstance(responses, list):
+            raw_docs = responses
+        else:
+            raw_docs = []
+
+        docs = [
+            {"title": d.get("title", ""), "url": d.get("url", ""), "content": d.get("content", "")}
+            for d in raw_docs
+        ]
 
     if not docs:
         return "No results found."
 
-    formatted_responses = "\n\n".join(
+    return "\n\n".join(
         f"[{i}]\n"
-        f"  Title: {doc.get('title', '')}\n"
-        f"  URL: {doc.get('url', '')}\n"
-        f"  Content: {doc.get('content', '')}"
+        f"  Title: {doc['title']}\n"
+        f"  URL: {doc['url']}\n"
+        f"  Content: {doc['content']}"
         for i, doc in enumerate(docs, start=1)
     )
-    return formatted_responses  
 
 @tool
 def arxiv_search(query: str) -> str:

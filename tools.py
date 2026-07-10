@@ -11,6 +11,7 @@ import PIL.Image
 import subprocess
 from langchain_tavily import TavilySearch
 from typing import Optional
+import re
 
 # ========================Calculator Tools========================
 @tool
