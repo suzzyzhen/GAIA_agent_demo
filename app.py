@@ -7,6 +7,7 @@ from langchain_core.messages import HumanMessage
 from agent import build_graph
 from huggingface_hub import hf_hub_download
 import re
+from langgraph.errors import GraphRecursionError
 
 # (Keep Constants as is)
 # --- Constants ---
@@ -52,7 +53,10 @@ class BasicAgent:
         print(f"Agent received question (first 50 chars): {question[:50]}...")
         user_content = build_user_content(question, file_name)
         messages = [HumanMessage(content=user_content)]
-        result = self.graph.invoke({"messages": messages})
+        result = self.graph.invoke(
+            {"messages": messages},
+            config={"recursion_limit": 50}
+            )
         answer = result['messages'][-1].content
         return extract_final_answer(answer)
         # return answer  
