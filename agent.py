@@ -234,42 +234,43 @@ def image_ocr(file_path: str) -> str:
 
 
 @tool
-def code_file_interpreter(file_path: str, mode: str = "execute") -> str:
-    """Read or execute a code file at the given file path.
-    mode='execute': runs the file (Python only) and returns stdout/stderr.
-    mode='read': returns the raw source code as text, for inspection/reasoning
-    without running it."""
-    
-    if mode == "read":
-        try:
-            with open(file_path, "r") as f:
-                return f.read()
-        except Exception as e:
-            return f"Error reading file: {e}"
+def read_code_file(file_path: str) -> str:
+    """Read and return the raw source code of a file at the given path,
+    without executing it. Use this to inspect code before running it.
+    Args:
+        file_path: Absolute path to the file to read."""
+    try:
+        with open(file_path, "r") as f:
+            return f.read()
+    except Exception as e:
+        return f"Error reading file: {e}"
 
-    elif mode == "execute":
-        if not file_path.endswith(".py"):
-            return "Error: execution is only supported for .py files. Use mode='read' for other file types."
-        try:
-            result = subprocess.run(
-                ["python", file_path],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-            output = result.stdout.strip()
-            error = result.stderr.strip()
-            if error:
-                return f"STDOUT:\n{output}\n\nSTDERR:\n{error}"
-            return output if output else "Code executed successfully with no output."
-        except subprocess.TimeoutExpired:
-            return "Error: code execution timed out after 30 seconds."
-        except Exception as e:
-            return f"Error executing file: {e}"
 
-    else:
-        return f"Unknown mode: {mode}. Use 'execute' or 'read'."
-    
+@tool
+def execute_python_file(file_path: str) -> str:
+    """Execute a Python (.py) file and return its stdout/stderr output.
+    Args:
+        file_path: Absolute path to the .py file to execute."""
+    if not file_path.endswith(".py"):
+        return "Error: only .py files can be executed. Use read_code_file to inspect other file types."
+    if not os.path.isfile(file_path):
+        return f"Error: file not found at {file_path}"
+    try:
+        result = subprocess.run(
+            ["python", file_path],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        output = result.stdout.strip()
+        error = result.stderr.strip()
+        if result.returncode != 0:
+            return f"Execution failed (exit code {result.returncode})\nSTDOUT:\n{output}\n\nSTDERR:\n{error}"
+        return output if output else "Code executed successfully with no output."
+    except subprocess.TimeoutExpired:
+        return "Error: code execution timed out after 30 seconds."
+    except Exception as e:
+        return f"Error executing file: {e}"
 
 @tool
 def audio_transcriber(file_path: str) -> str:
@@ -303,7 +304,8 @@ tools = [
     pdf_reader,
     spreadsheet_reader,
     image_ocr,
-    code_file_interpreter, 
+    read_code_file,
+    execute_python_file,
     audio_transcriber,
     youtube_transcript,
     
