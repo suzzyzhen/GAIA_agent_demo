@@ -3,7 +3,6 @@ requests
 langgraph
 langchain
 langchain-groq
-duckduckgo-search
 langchain-core
 langchain-tavily
 wikipedia
@@ -18,3 +17,5 @@ langchain-google-genai
 langchain-huggingface
 openai-whisper
 youtube-transcript-api
+openpyxl
+ddgs
