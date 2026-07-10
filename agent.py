@@ -20,7 +20,7 @@ from langchain_groq import ChatGroq
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint, HuggingFaceEmbeddings
 from langgraph.graph.message import add_messages
 import whisper
-
+from youtube_transcript_api import YouTubeTranscriptApi
 
 
 # GROQ_API_KEY = os.environ["GROQ_API_KEY"] 
@@ -214,7 +214,7 @@ def image_ocr(file_path: str) -> str:
 
 @tool
 def code_file_interpreter(file_path: str, mode: str = "execute") -> str:
-    """Read or execute a code file at the given local file path.
+    """Read or execute a code file at the given file path.
     mode='execute': runs the file (Python only) and returns stdout/stderr.
     mode='read': returns the raw source code as text, for inspection/reasoning
     without running it."""
@@ -249,15 +249,6 @@ def code_file_interpreter(file_path: str, mode: str = "execute") -> str:
     else:
         return f"Unknown mode: {mode}. Use 'execute' or 'read'."
     
-@tool
-def analyze_image(file_path: str) -> str:
-    """Analyze an image and answer a question about it."""
-
-    with open(file_path, "rb") as f:
-        image_bytes = f.read()
-
-    return f"Received image of size {len(image_bytes)} bytes. (Image analysis not implemented yet.)"
-
 
 @tool
 def audio_transcriber(file_path: str) -> str:
@@ -268,6 +259,20 @@ def audio_transcriber(file_path: str) -> str:
     result = _whisper_model.transcribe(file_path)
     return result["text"].strip()
 
+
+@tool
+def youtube_transcript(url: str, chars: int = 10_000) -> str:
+    """Fetch full YouTube transcript (first *chars* characters)."""
+    video_id_match = re.search(r"[?&]v=([A-Za-z0-9_\-]{11})", url)
+    if not video_id_match:
+        return "yt_error:id_not_found"
+    try:
+        transcript = YouTubeTranscriptApi.get_transcript(video_id_match.group(1))
+        text = " ".join(piece["text"] for piece in transcript)
+        return text[:chars]
+    except Exception as e:
+        return f"yt_error:{e}"
+    
 # ==================================================================================
 tools = [
     web_search,
@@ -278,13 +283,11 @@ tools = [
     spreadsheet_reader,
     image_ocr,
     code_file_interpreter, 
-    analyze_image,
     audio_transcriber,
+    youtube_transcript,
     
 ]
 
-class AgentState(TypedDict):
-    messages: Annotated[list, add_messages]
 
 def build_graph(provider: str = "google"):
     """Build the graph"""
@@ -306,7 +309,7 @@ def build_graph(provider: str = "google"):
 
     llm_with_tools = llm.bind_tools(tools)
 
-    def assistant(state: AgentState):
+    def assistant(state: MessagesState):
         """Assistant node"""
         with open('system_prompt.txt', 'r') as f:
             system_prompt = f.read()
@@ -315,7 +318,7 @@ def build_graph(provider: str = "google"):
         return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"])]}
 
     # Graph
-    builder = StateGraph(AgentState)
+    builder = StateGraph(MessagesState)
 
     # Nodes
     builder.add_node("assistant", assistant)
