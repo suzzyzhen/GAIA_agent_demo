@@ -19,3 +19,4 @@ openai-whisper
 youtube-transcript-api
 openpyxl
 ddgs
+tabulate
