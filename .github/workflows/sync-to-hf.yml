@@ -1,0 +1,47 @@
+name: HuggingFace Space Sync
+
+on:
+  push:
+    branches: [main]
+
+env:
+  HF_USER: "suzzy123"
+  HF_SPACE: "GAIA_agent_demo"
+
+jobs:
+  sync-to-space:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: true
+
+      - name: Set full repo path
+        run: |
+          export FULL_REPO="${HF_USER}/${HF_SPACE}"
+          echo "Full repo path: ${FULL_REPO}"
+          echo "FULL_REPO=${FULL_REPO}" >> $GITHUB_ENV
+
+      - name: Confirm target Space exists
+        run: |
+          echo "Checking https://huggingface.co/spaces/${FULL_REPO}.git"
+          if git ls-remote "https://huggingface.co/spaces/${FULL_REPO}.git" &>/dev/null; then
+            echo "Space found. Proceeding with sync."
+          else
+            echo "Space not found at https://huggingface.co/spaces/${FULL_REPO}.git"
+            exit 1
+          fi
+
+      - name: Push main branch to Hugging Face
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Pushing local HEAD (GitHub main) to ${FULL_REPO}:main (force push)"
+          if git push -f "https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${FULL_REPO}.git" HEAD:main; then
+            echo "Sync complete."
+          else
+            echo "Push failed. Check that HF_TOKEN has write access to ${FULL_REPO}."
+            exit 1
+          fi
