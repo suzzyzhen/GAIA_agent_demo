@@ -11,7 +11,7 @@ from agent import build_graph, extract_final_answer
 
 DEFAULT_API_URL = "https://agents-course-unit4-scoring.hf.space"
 
-# test_question = "What is the answer of 5 + 3?"
+test_question = "What is the answer of 5 + 3?"
 
 # def test_graph(question:str):
 #     graph = build_graph(provider="huggingface") 
