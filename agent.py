@@ -12,6 +12,7 @@ from langgraph.graph import MessagesState, START, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 from dotenv import load_dotenv
 from tools import tools
+import re
 
 
 load_dotenv()
@@ -69,3 +70,21 @@ def build_graph(provider: str = "google"):
     react_graph = builder.compile()
 
     return react_graph
+
+def extract_final_answer(text: str) -> str:
+    """Pull the text following 'FINAL ANSWER:' out of the agent's raw response,
+    falling back to the full response if the marker isn't present."""
+    match = re.search(r"FINAL ANSWER:\s*(.+)", text, re.IGNORECASE)
+    return match.group(1).strip() if match else text.strip()
+
+
+def run_agent(graph, question: str, recursion_limit: int = 50) -> str:
+    """Invoke the graph on a single question and return the cleaned final answer."""
+    from langchain_core.messages import HumanMessage
+
+    result = graph.invoke(
+        {"messages": [HumanMessage(content=question)]},
+        config={"recursion_limit": recursion_limit},
+    )
+    raw_answer = result["messages"][-1].content
+    return extract_final_answer(raw_answer)

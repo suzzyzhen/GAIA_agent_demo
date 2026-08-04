@@ -4,7 +4,7 @@ import requests
 import inspect
 import pandas as pd
 from langchain_core.messages import HumanMessage
-from agent import build_graph
+from agent import build_graph, run_agent
 from huggingface_hub import hf_hub_download
 import re
 from langgraph.errors import GraphRecursionError
@@ -16,18 +16,12 @@ DEFAULT_API_URL = "https://agents-course-unit4-scoring.hf.space"
 # --- Basic Agent Definition ---
 # ----- THIS IS WERE YOU CAN BUILD WHAT YOU WANT ------
 
-def extract_final_answer(text: str) -> str:
-    match = re.search(r"FINAL ANSWER:\s*(.+)", text, re.IGNORECASE)
-    return match.group(1).strip() if match else text.strip()
-
 def resolve_file(file_name: str) -> str | None:
     """Download a GAIA task attachment and return its local path.
     Returns None if no file_name is provided."""
     if not file_name:
         return None
 
-    # hf_hub_download caches files locally — calling it twice for the same
-    # file is free (returns the cached path immediately).
     return hf_hub_download(
         repo_id="gaia-benchmark/GAIA",
         repo_type="dataset",
@@ -48,18 +42,10 @@ class BasicAgent:
         print("BasicAgent initialized.")
         self.graph = build_graph(provider="huggingface")
 
-
     def __call__(self, question: str, file_name: str = "") -> str:
         print(f"Agent received question (first 50 chars): {question[:50]}...")
         user_content = build_user_content(question, file_name)
-        messages = [HumanMessage(content=user_content)]
-        result = self.graph.invoke(
-            {"messages": messages},
-            config={"recursion_limit": 50}
-            )
-        answer = result['messages'][-1].content
-        return extract_final_answer(answer)
-        # return answer  
+        return run_agent(self.graph, user_content)
 
 
 def run_and_submit_all(profile: gr.OAuthProfile | None):
