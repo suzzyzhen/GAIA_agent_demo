@@ -15,7 +15,7 @@ import shutil
 
 AUDIO_TASK_FILENAME = "2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3"
 PDF_TASK_FILENAME = "2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf"
-IMAGE_TASK_FILENAME = "2023/validation/5b2a14e8-6e59-479c-80e3-4696e8980152.jpg"
+IMAGE_TASK_FILENAME = "2023/validation/df6561b2-7ee5-4540-baab-5095f742716a.png"
 
 
 def download_gaia_file(filename: str, local_name: str) -> str:
@@ -43,7 +43,7 @@ DOWNLOADED_FILE_PATHS = {
 
 EXAMPLES = [
     ["What's the population of France divided by 2?", None],
-    ["Find the most recent arXiv paper on transformer efficiency and summarize its key finding.", None],
+    ["On the BBC Earth YouTube video of the Top 5 Silliest Animal Moments, what species of bird is featured?", None],
     [
         """Hi, I'm making a pie but I could use some help with my shopping list. I have everything I need for the crust, but I'm not sure about the filling. I got the recipe from my friend Aditi, but she left it as a voice memo and the speaker on my phone is buzzing so I can't quite make out what she's saying. Could you please listen to the recipe and list all of the ingredients that my friend described? I only want the ingredients for the filling, as I have everything I need to make my favorite pie crust. I've attached the recipe as Strawberry pie.mp3. In your response, please only list the ingredients, not any measurements. So if the recipe calls for "a pinch of salt" or "two cups of ripe strawberries" the ingredients on the list would be "salt" and "ripe strawberries". Please format your response as a comma separated list of ingredients. Also, please alphabetize the ingredients.""",
         DOWNLOADED_FILE_PATHS["audio"],
@@ -54,8 +54,7 @@ EXAMPLES = [
         DOWNLOADED_FILE_PATHS["pdf"],
     ],
     [
-        "The brand that makes these harnesses the dogs are wearing in the attached pic shares stories from their \
-        ambassadors on their website. What meat is mentioned in the story added Dec 8th 2022??",
+        "When you take the average of the standard population deviation of the red numbers and the standard sample deviation of the green numbers in this image using the statistics module in Python 3.11, what is the result rounded to the nearest three decimal points?",
         DOWNLOADED_FILE_PATHS["image"],
     ],
 ]
