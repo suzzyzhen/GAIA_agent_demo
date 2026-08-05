@@ -15,7 +15,7 @@ import shutil
 
 AUDIO_TASK_FILENAME = "2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3"
 PDF_TASK_FILENAME = "2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf"
-IMAGE_TASK_FILENAME = "2023/validation/df6561b2-7ee5-4540-baab-5095f742716a.png"
+IMAGE_TASK_FILENAME = "2023/validation/5b2a14e8-6e59-479c-80e3-4696e8980152.jpg"
 
 
 def download_gaia_file(filename: str, local_name: str) -> str:
@@ -54,7 +54,7 @@ EXAMPLES = [
         DOWNLOADED_FILE_PATHS["pdf"],
     ],
     [
-        "When you take the average of the standard population deviation of the red numbers and the standard sample deviation of the green numbers in this image using the statistics module in Python 3.11, what is the result rounded to the nearest three decimal points?",
+        "Describe this image",
         DOWNLOADED_FILE_PATHS["image"],
     ],
 ]
