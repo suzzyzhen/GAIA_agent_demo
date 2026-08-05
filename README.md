@@ -100,8 +100,7 @@ The Space's hardware, SDK, and entrypoint (`app_file`) are configured via the YA
 ## Notes
 
 - Sample files used in the demo's example questions are downloaded at runtime from the GAIA dataset (not committed to this repo) to avoid storing binaries in git history.
-
-### Source of multimodal files in the examples ###
+- Source of multimodal files in the examples
 [Audio](https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/main/2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3)
 [Image](https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/main/2023/validation/5b2a14e8-6e59-479c-80e3-4696e8980152.jpg)
 [PDF](https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/main/2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf)
@@ -110,9 +109,3 @@ The Space's hardware, SDK, and entrypoint (`app_file`) are configured via the YA
 - `demo_app.py` (the public demo) and `app.py` (the GAIA scoring harness) and  are kept separate so the portfolio-facing demo never requires visitors to log in or triggers a benchmark submission.
 
 
-
-
-Example multimodal files: 
-audio: https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/main/2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3
-picture: https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/main/2023/validation/5b2a14e8-6e59-479c-80e3-4696e8980152.jpg
-pdf: https://huggingface.co/datasets/gaia-benchmark/GAIA/blob/main/2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf
