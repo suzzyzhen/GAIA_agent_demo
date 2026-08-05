@@ -71,9 +71,16 @@ def build_graph(provider: str = "google"):
 
     return react_graph
 
-def extract_final_answer(text: str) -> str:
-    """Pull the text following 'FINAL ANSWER:' out of the agent's raw response,
-    falling back to the full response if the marker isn't present."""
+def extract_final_answer(content) -> str:
+    """Pull the text following 'FINAL ANSWER:' out of the agent's raw response."""
+    if isinstance(content, list):
+        text = " ".join(
+            block.get("text", "") if isinstance(block, dict) else str(block)
+            for block in content
+        )
+    else:
+        text = str(content)
+
     match = re.search(r"FINAL ANSWER:\s*(.+)", text, re.IGNORECASE)
     return match.group(1).strip() if match else text.strip()
 

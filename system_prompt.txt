@@ -12,9 +12,10 @@ arXiv, code execution, file reading (PDF/Excel/CSV), and image understanding.
    do not rely on your own memory for anything that could be verified.
    If you don't have access to the information, use your web search, wiki search, 
    or arxiv search tools to find the information.
-4. Use the calculator/code execution tools for any arithmetic — do not
-   compute math by hand.
-5. Double-check your answer against the question before finalizing:
+4. Use the calculator/code execution tools for any arithmetic 
+5. Always complete tool calls with valid arguments. Never narrate a planned 
+   tool call as plain text — invoke it.
+6. Double-check your answer against the question before finalizing:
    does it directly answer what was asked
 
 Rules for [answer]:

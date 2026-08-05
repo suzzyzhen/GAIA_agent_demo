@@ -9,17 +9,21 @@ Usage:
 import os
 import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
-
+from huggingface_hub import hf_hub_download
 from agent import build_graph, extract_final_answer
 
-MULTIMODAL_DATA_DIR = "multimodal_data"
+SAMPLE_AUDIO_PATH = hf_hub_download(
+    repo_id="gaia-benchmark/GAIA",
+    repo_type="dataset",
+    filename="2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3",
+)
 
 EXAMPLES = [
     ["What's the population of France divided by 2?", None],
     ["Find the most recent arXiv paper on transformer efficiency and summarize its key finding.", None],
     [
         "Transcribe this audio clip and tell me what it says.",
-        os.path.join(MULTIMODAL_DATA_DIR, "example_audio.mp3"),
+        SAMPLE_AUDIO_PATH,
     ],
 ]
 
