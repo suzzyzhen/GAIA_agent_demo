@@ -34,14 +34,18 @@ jobs:
             exit 1
           fi
 
-      - name: Push main branch to Hugging Face
+      - name: Push squashed snapshot to Hugging Face
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          echo "Pushing local HEAD (GitHub main) to ${FULL_REPO}:main (force push)"
-          if git push -f "https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${FULL_REPO}.git" HEAD:main; then
+          git checkout --orphan hf-sync-branch
+          git add -A
+          git commit -m "Sync to Hugging Face Space"
+          if git push -f "https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${FULL_REPO}.git" hf-sync-branch:main; then
             echo "Sync complete."
           else
             echo "Push failed. Check that HF_TOKEN has write access to ${FULL_REPO}."
             exit 1
           fi
+          git checkout main
+          git branch -D hf-sync-branch
