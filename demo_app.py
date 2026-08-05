@@ -16,6 +16,7 @@ SAMPLE_AUDIO_PATH = hf_hub_download(
     repo_id="gaia-benchmark/GAIA",
     repo_type="dataset",
     filename="2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3",
+    token=os.environ.get("HF_TOKEN"),
 )
 
 EXAMPLES = [
