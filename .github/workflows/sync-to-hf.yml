@@ -38,10 +38,11 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
+          git config user.email "action@github.com"
+          git config user.name "szhen"
           git checkout --orphan hf-sync-branch
           git add -A
           git commit -m "Sync to Hugging Face Space"
-          git config --global user.name "szhen"
           if git push -f "https://${HF_USER}:${HF_TOKEN}@huggingface.co/spaces/${FULL_REPO}.git" hf-sync-branch:main; then
             echo "Sync complete."
           else
