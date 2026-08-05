@@ -234,7 +234,7 @@ def read_code_file(file_path: str) -> str:
 
 
 @tool
-def execute_python_file(file_path: str) -> str:
+def run_python_code(file_path: str) -> str:
     """Execute a Python (.py) file and return its stdout/stderr output.
     Args:
         file_path: Absolute path to the .py file to execute."""
@@ -306,7 +306,7 @@ tools = [
     spreadsheet_reader,
     image_ocr,
     read_code_file,
-    execute_python_file,
+    run_python_code,
     audio_transcriber,
     youtube_transcript,
 ]

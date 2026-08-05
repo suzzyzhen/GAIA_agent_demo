@@ -67,7 +67,7 @@ TOOL_LABELS = {
     "spreadsheet_reader": "Spreadsheet reader",
     "image_ocr": "Image OCR",
     "read_code_file": "Code reader",
-    "execute_python_file": "Code executor",
+    "run_python_code": "Code executor",
     "audio_transcriber": "Audio transcriber",
     "youtube_transcript": "YouTube transcript",
 }
