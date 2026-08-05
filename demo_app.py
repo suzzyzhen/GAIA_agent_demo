@@ -11,13 +11,19 @@ import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from huggingface_hub import hf_hub_download
 from agent import build_graph, extract_final_answer
+import shutil
 
-SAMPLE_AUDIO_PATH = hf_hub_download(
+_downloaded_audio_path = hf_hub_download(
     repo_id="gaia-benchmark/GAIA",
     repo_type="dataset",
     filename="2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3",
     token=os.environ.get("HF_TOKEN"),
 )
+
+os.makedirs("multimodal_data", exist_ok=True)
+SAMPLE_AUDIO_PATH = os.path.join("multimodal_data", "example_audio.mp3")
+shutil.copy(_downloaded_audio_path, SAMPLE_AUDIO_PATH)
+
 
 EXAMPLES = [
     ["What's the population of France divided by 2?", None],
