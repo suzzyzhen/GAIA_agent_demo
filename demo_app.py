@@ -13,16 +13,32 @@ from huggingface_hub import hf_hub_download
 from agent import build_graph, extract_final_answer
 import shutil
 
-_downloaded_audio_path = hf_hub_download(
-    repo_id="gaia-benchmark/GAIA",
-    repo_type="dataset",
-    filename="2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3",
-    token=os.environ.get("HF_TOKEN"),
-)
+AUDIO_TASK_FILENAME = "2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3"
+PDF_TASK_FILENAME = "2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf"
+IMAGE_TASK_FILENAME = "2023/validation/5b2a14e8-6e59-479c-80e3-4696e8980152.jpg"
 
-os.makedirs("multimodal_data", exist_ok=True)
-SAMPLE_AUDIO_PATH = os.path.join("multimodal_data", "example_audio.mp3")
-shutil.copy(_downloaded_audio_path, SAMPLE_AUDIO_PATH)
+
+def download_gaia_file(filename: str, local_name: str) -> str:
+    """Download a GAIA file and copy it into the local working directory
+    so Gradio's file-serving checks accept it (see: InvalidPathError)."""
+    downloaded_path = hf_hub_download(
+        repo_id="gaia-benchmark/GAIA",
+        repo_type="dataset",
+        filename=filename,
+        token=os.environ.get("HF_TOKEN"),
+    )
+    os.makedirs("multimodal_data", exist_ok=True)
+    local_path = os.path.join("multimodal_data", local_name)
+    shutil.copy(downloaded_path, local_path)
+    return local_path
+
+
+DOWNLOADED_FILE_PATHS = {
+    "audio": download_gaia_file(AUDIO_TASK_FILENAME, "example_audio.mp3"),
+    "pdf": download_gaia_file(PDF_TASK_FILENAME, "example_document.pdf"),
+    "image": download_gaia_file(IMAGE_TASK_FILENAME, "example_image.png"),
+}
+
 
 
 EXAMPLES = [
@@ -30,7 +46,17 @@ EXAMPLES = [
     ["Find the most recent arXiv paper on transformer efficiency and summarize its key finding.", None],
     [
         "Transcribe this audio clip and tell me what it says.",
-        SAMPLE_AUDIO_PATH,
+        DOWNLOADED_FILE_PATHS["audio"],
+    ],
+    [
+        "The attached file lists accommodations in the resort town of Seahorse Island. Based on the information in this file, \
+        which seems like the better available place to stay for a family that enjoys swimming and wants a full house?",
+        DOWNLOADED_FILE_PATHS["pdf"],
+    ],
+    [
+        "The brand that makes these harnesses the dogs are wearing in the attached pic shares stories from their \
+        ambassadors on their website. What meat is mentioned in the story added Dec 8th 2022??",
+        DOWNLOADED_FILE_PATHS["image"],
     ],
 ]
 
