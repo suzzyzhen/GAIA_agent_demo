@@ -28,3 +28,6 @@ build/
 
 # notebooks
 notebooks/
+
+# Data
+multimodal_data/
