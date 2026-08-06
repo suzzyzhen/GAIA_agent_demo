@@ -53,7 +53,31 @@ The agent reasons step by step and calls tools as needed to answer a question, r
 - **`demo_app.py`** is a standalone Gradio app for public demoing: a question box, example prompts (including file-based examples for transcription, PDF reading, and OCR), a live tool-call trace panel, and the final answer — no login or scoring involved.
 - **`app.py`** is the original GAIA coursework harness: requires Hugging Face login, fetches the official question set, runs the agent on each question, and submits answers for scoring.
 
-![Architecture](agent_architecure.png)
+```mermaid
+flowchart TD
+    A([User Question + optional file]) --> B[Agent Reasoning<br/>LLM bound to all tools]
+    B --> C{Needs a tool?}
+    C -->|No| H[Return response]
+    C -->|Yes| D{What kind of task?}
+    D -->|Web/general knowledge| E1[web_search / wikipedia_search / arxiv_search]
+    D -->|File: PDF| E2[pdf_reader]
+    D -->|File: spreadsheet| E3[spreadsheet_reader]
+    D -->|File: image| E4[image_ocr]
+    D -->|File: audio| E5[audio_transcriber]
+    D -->|File: code| E6[read_code_file / execute_python_file]
+    D -->|YouTube link| E7[youtube_transcript]
+    D -->|Arithmetic| E8[add / subtract / multiply / divide / power / modulus / square_root]
+    E1 --> B
+    E2 --> B
+    E3 --> B
+    E4 --> B
+    E5 --> B
+    E6 --> B
+    E7 --> B
+    E8 --> B
+    H --> I[Extract FINAL ANSWER]
+    I --> J([Final Answer])
+```
 
 ## Running locally
 

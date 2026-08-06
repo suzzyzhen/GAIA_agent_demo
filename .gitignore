@@ -31,3 +31,6 @@ notebooks/
 
 # Data
 multimodal_data/
+
+# images
+*.png
