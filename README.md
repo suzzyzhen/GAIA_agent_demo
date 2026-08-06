@@ -9,6 +9,7 @@ app_file: demo_app.py
 pinned: false
 ---
 
+
 # GAIA Agent Demo
 
 A tool-calling AI agent built with [LangGraph](https://github.com/langchain-ai/langgraph), capable of web search, document reading, calculations, audio transcription, and more. Built as part of the [GAIA benchmark](https://huggingface.co/datasets/gaia-benchmark/GAIA) [Hugingface AI Agents](https://huggingface.co/learn/agents-course/unit0/introduction)coursework, and adapted here into a live portfolio demo.
