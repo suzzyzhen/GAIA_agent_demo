@@ -53,6 +53,8 @@ The agent reasons step by step and calls tools as needed to answer a question, r
 - **`demo_app.py`** is a standalone Gradio app for public demoing: a question box, example prompts (including file-based examples for transcription, PDF reading, and OCR), a live tool-call trace panel, and the final answer — no login or scoring involved.
 - **`app.py`** is the original GAIA coursework harness: requires Hugging Face login, fetches the official question set, runs the agent on each question, and submits answers for scoring.
 
+![Architecture](architecture.png)
+
 ## Running locally
 
 **1. Clone and set up a virtual environment**
