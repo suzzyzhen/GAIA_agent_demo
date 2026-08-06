@@ -54,7 +54,7 @@ EXAMPLES = [
         DOWNLOADED_FILE_PATHS["pdf"],
     ],
     [
-        "Describe this image",
+        "What animals are in the image",
         DOWNLOADED_FILE_PATHS["image"],
     ],
 ]
