@@ -147,16 +147,17 @@ with gr.Blocks(title="GAIA agent demo") as demo:
 
     submit_button = gr.Button("Ask agent", variant="primary")
 
+    answer_output = gr.Textbox(label="Final answer", interactive=False)
+
     gr.Examples(
         examples=EXAMPLES,
         inputs=[question_box, file_box],
         label="Try an example",
     )
 
-    with gr.Accordion("Agent trace", open=False):
+    with gr.Accordion("Agent trace", open=True):
         trace_output = gr.Markdown()
 
-    answer_output = gr.Textbox(label="Final answer", interactive=False)
 
     submit_button.click(
         fn=run_agent,
