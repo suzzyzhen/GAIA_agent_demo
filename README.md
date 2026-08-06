@@ -14,7 +14,7 @@ pinned: false
 
 A tool-calling AI agent built with [LangGraph](https://github.com/langchain-ai/langgraph), capable of web search, document reading, calculations, audio transcription, and more. Built as part of the [GAIA benchmark](https://huggingface.co/datasets/gaia-benchmark/GAIA) [Hugingface AI Agents](https://huggingface.co/learn/agents-course/unit0/introduction)coursework, and adapted here into a live portfolio demo.
 
-**[Try the live demo](https://huggingface.co/spaces/suzzy123/GAIA_agent_demo)**
+### **[Try the live demo](https://huggingface.co/spaces/suzzy123/GAIA_agent_demo)**
 
 ## What this agent can do
 
