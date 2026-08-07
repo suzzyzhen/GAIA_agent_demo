@@ -1,17 +1,18 @@
 """
 demo_app.py
-Portfolio demo for the GAIA agent. 
+Portfolio demo for the GAIA agent.
 
 Usage:
     python demo_app.py
 """
 
 import os
+import mimetypes
+import shutil
 import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from huggingface_hub import hf_hub_download
 from agent import build_graph, extract_final_answer
-import shutil
 
 AUDIO_TASK_FILENAME = "2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3"
 PDF_TASK_FILENAME = "2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf"
@@ -40,7 +41,6 @@ DOWNLOADED_FILE_PATHS = {
 }
 
 
-
 EXAMPLES = [
     ["What's the population of France divided by 2?", None],
     ["On the BBC Earth YouTube video of the Top 5 Silliest Animal Moments, what species of bird is featured?", None],
@@ -53,10 +53,11 @@ EXAMPLES = [
         which seems like the better available place to stay for a family that enjoys swimming and wants a full house?",
         DOWNLOADED_FILE_PATHS["pdf"],
     ],
-    [   "The paint sample in the upper center of the attached image has a punny name. What word is the sample’s name meant to sound like?",
-         DOWNLOADED_FILE_PATHS["image"],
+    [
+        "The paint sample in the upper center of the attached image has a punny name. What word is the sample's name meant to sound like?",
+        DOWNLOADED_FILE_PATHS["image"],
     ],
-  ]
+]
 
 TOOL_LABELS = {
     "web_search": "Web search",
@@ -118,45 +119,99 @@ def run_agent(question: str, file_path: str | None, provider: str = "google"):
         yield trace_markdown, final_answer
 
 
-with gr.Blocks(title="GAIA agent demo") as demo:
-    gr.Markdown(
-        """
-        # GAIA agent demo
+def preview_attachment(file_path: str | None):
+    if not file_path:
+        return (
+            gr.update(visible=False, value=None),  # image
+            gr.update(visible=False, value=None),  # audio
+            gr.update(visible=False, value=None),  # pdf
+            gr.update(visible=False, value=None),  # general files
+        )
 
-        A LangGraph tool-calling agent that can search the web, read files,
-        run calculations, transcribe audio, and more. Ask it a question
-        below, or try one of the examples -- including an audio
-        transcription example.
+    mime, _ = mimetypes.guess_type(file_path)
+    mime = mime or ""
+    is_image = mime.startswith("image/")
+    is_audio = mime.startswith("audio/")
+    is_pdf = mime == "application/pdf"
 
-        [View the code on GitHub](https://github.com/suzzyzhen/GAIA_agent_demo)
-        """
+    return (
+        gr.update(visible=is_image, value=file_path if is_image else None),
+        gr.update(visible=is_audio, value=file_path if is_audio else None),
+        gr.update(visible=is_pdf, value=file_path if is_pdf else None),
+        gr.update(visible=not (is_image or is_audio or is_pdf), value=file_path if not (is_image or is_audio or is_pdf) else None),
+        gr.update(visible=True),
     )
 
-    with gr.Row():
+# ================================== Format ==================================
+
+CUSTOM_CSS = """
+.gaia-card {
+    border-radius: 16px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06) !important;
+    padding: 18px !important;
+}
+#final-answer-box textarea {
+    font-size: 1.15rem !important;
+    font-weight: 600 !important;
+    border: 2px solid #6366f1 !important;
+    border-radius: 12px !important;
+    background: #eef2ff !important;
+}
+#header-title { text-align: center; margin-bottom: 0.1rem; }
+#header-sub { text-align: center; color: #6b7280; margin-bottom: 0.5rem; }
+"""
+
+# ================================== Gradio ==================================
+with gr.Blocks(
+    theme=gr.themes.Soft(primary_hue="indigo"),
+    css=CUSTOM_CSS,
+    title="GAIA agent demo",
+) as demo:
+    gr.Markdown("# GAIA agent demo", elem_id="header-title")
+    gr.Markdown(
+        "A LangGraph tool-calling agent that can search the web, read files, "
+        "run calculations, transcribe audio, and more. "
+        "[View the code on GitHub](https://github.com/suzzyzhen/GAIA_agent_demo)",
+        elem_id="header-sub",
+    )
+
+    with gr.Group(elem_classes="gaia-card"):
+        gr.Markdown("### Try an example")
         question_box = gr.Textbox(
             label="Question",
-            placeholder="Ask the agent a question",
-            scale=4,
+            placeholder="Ask the agent a question, or pick an example below...",
+            lines=2,
         )
-        file_box = gr.File(
-            label="Attach a file (optional)",
-            type="filepath",
-            scale=2,
+        file_box = gr.File(label="Attach a file (optional)", type="filepath")
+        gr.Examples(
+            examples=EXAMPLES,
+            inputs=[question_box, file_box],
+            label=None,
         )
+        submit_button = gr.Button("Ask agent", variant="primary", size="lg")
 
-    submit_button = gr.Button("Ask agent", variant="primary")
 
-    answer_output = gr.Textbox(label="Final answer", interactive=False)
+    with gr.Group(elem_classes="gaia-card", visible=False) as preview_wrapper:
+        gr.Markdown("### 📎 Attachment preview")
+        preview_image = gr.Image(label="Image attachment", visible=False, interactive=False)
+        preview_audio = gr.Audio(label="Audio attachment", visible=False, interactive=False)
+        preview_file = gr.File(label="File attachment", visible=False, interactive=False)
 
-    gr.Examples(
-        examples=EXAMPLES,
-        inputs=[question_box, file_box],
-        label="Try an example",
-    )
 
-    with gr.Accordion("Agent trace", open=True):
+    with gr.Accordion("🔍 Agent trace", open=True, elem_classes="gaia-card"):
         trace_output = gr.Markdown()
 
+    with gr.Group(elem_classes="gaia-card"):
+        gr.Markdown("### Final answer")
+        answer_output = gr.Textbox(
+            label=None, show_label=False, interactive=False, elem_id="final-answer-box"
+        )
+
+    file_box.change(
+        fn=preview_attachment,
+        inputs=file_box,
+        outputs=[preview_image, preview_audio, preview_file, preview_wrapper],
+    )
 
     submit_button.click(
         fn=run_agent,
