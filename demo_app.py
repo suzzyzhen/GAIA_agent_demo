@@ -15,7 +15,7 @@ import shutil
 
 AUDIO_TASK_FILENAME = "2023/validation/99c9cc74-fdc8-46c6-8f8d-3ce2d3bfeea3.mp3"
 PDF_TASK_FILENAME = "2023/validation/366e2f2b-8632-4ef2-81eb-bc3877489217.pdf"
-IMAGE_TASK_FILENAME = "2023/validation/5b2a14e8-6e59-479c-80e3-4696e8980152.jpg"
+IMAGE_TASK_FILENAME = "2023/validation/cca530fc-4052-43b2-b130-b30968d8aa44.png"
 
 
 def download_gaia_file(filename: str, local_name: str) -> str:
@@ -53,10 +53,10 @@ EXAMPLES = [
         which seems like the better available place to stay for a family that enjoys swimming and wants a full house?",
         DOWNLOADED_FILE_PATHS["pdf"],
     ],
-    # [
-    #     "What animals are in the image",
-    #     DOWNLOADED_FILE_PATHS["image"],
-    # ],
+    [
+        "Review the chess position provided in the image. It is black's turn. Provide the correct next move for black which guarantees a win. Please provide your response in algebraic notation.",
+        DOWNLOADED_FILE_PATHS["image"],
+    ],
     ["A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?", None]
 ]
 
